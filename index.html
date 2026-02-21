@@ -358,72 +358,17 @@
     function unlockSection(val, dept, fields) {
         const isCorrect = (val === keys[dept]);
         fields.forEach(id => {
-            document.getElementById(id).disabled = !isCorrect;
-            if(isCorrect) {
-                document.getElementById(id).style.borderColor = "#27ae60";
-            } else {
-                document.getElementById(id).style.borderColor = "#ccc";
-            }
+            const el = document.getElementById(id);
+            el.disabled = !isCorrect;
+            el.style.borderColor = isCorrect ? "#27ae60" : "#ddd";
         });
     }
 
-    // معالجة الإرسال
     document.getElementById('mainForm').onsubmit = function() {
-        // تفعيل الخانات مؤقتاً عند الضغط لضمان إرسال النص الموجود بداخلها
         const textareas = document.querySelectorAll('textarea');
-        textareas.forEach(t => t.disabled = false);
-        
-        // إشعار بسيط للمستخدم
-        alert("جاري إرسال البيانات... ستتلقى تأكيداً فورياً.");
+        textareas.forEach(t => t.disabled = false); // تفعيل الخانات للإرسال
+        alert("يتم الآن إرسال التقارير إلى البريد الإلكتروني: ibidofe@gmail.com");
     };
-</script>
-
-</body>
-</html>
-    </div>
-
-    <div class="section">
-        <div class="lock-area">
-            <label>قفل الوصول (المصلحة الثانية):</label>
-            <input type="password" placeholder="أدخل الرمز لفتح القائمة 4" oninput="unlockSection(this.value, 'dept2', ['list4'])">
-        </div>
-        <div class="section-title">بيانات المصلحة الثانية</div>
-        <label>القائمة الرابعة:</label>
-        <select id="list4" disabled><option>اختيار 4...</option></select>
-    </div>
-
-    <div class="section">
-        <div class="lock-area">
-            <label>قفل الوصول (المصلحة الثالثة):</label>
-            <input type="password" placeholder="أدخل الرمز لفتح القائمة 5" oninput="unlockSection(this.value, 'dept3', ['list5'])">
-        </div>
-        <div class="section-title">بيانات المصلحة الثالثة</div>
-        <label>القائمة الخامسة:</label>
-        <select id="list5" disabled><option>اختيار 5...</option></select>
-    </div>
-
-    <button class="btn-submit">حفظ وإرسال المعطيات</button>
-</div>
-
-<script>
-    // كلمات المرور الافتراضية (يمكن تغييرها)
-    const keys = {
-        dept1: "123", // رمز المصلحة الأولى
-        dept2: "456", // رمز المصلحة الثانية
-        dept3: "789"  // رمز المصلحة الثالثة
-    };
-
-    function unlockSection(val, dept, lists) {
-        if (val === keys[dept]) {
-            lists.forEach(id => {
-                document.getElementById(id).disabled = false;
-            });
-        } else {
-            lists.forEach(id => {
-                document.getElementById(id).disabled = true;
-            });
-        }
-    }
 </script>
 
 </body>
