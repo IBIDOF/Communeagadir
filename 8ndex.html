@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة المعطيات - جماعة أكادير</title>
+    <style>
+        :root {
+            --primary-blue: #1a5276;
+            --gold-accent: #d4af37;
+            --bg-light: #f4f7f6;
+            --text-dark: #2c3e50;
+            --success-green: #27ae60;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg-light); 
+            margin: 0; 
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        .container { 
+            max-width: 850px; 
+            margin: 20px auto; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 15px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border-top: 8px solid var(--primary-blue);
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            max-width: 180px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        .header-titles h1 {
+            font-size: 22px;
+            color: var(--primary-blue);
+            margin: 5px 0;
+        }
+
+        .section { 
+            margin-bottom: 35px; 
+            padding: 25px; 
+            background: #fff;
+            border: 1px solid #e0e0e0; 
+            border-radius: 12px; 
+            position: relative;
+        }
+
+        .lock-badge {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: var(--primary-blue);
+            color: white;
+            padding: 4px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+        }
+
+        .lock-input-group {
+            background: #f8fbff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px dashed var(--primary-blue);
+        }
+
+        label { 
+            display: block; 
+            margin-top: 15px; 
+            font-weight: bold; 
+            color: var(--primary-blue); 
+        }
+
+        input[type="text"], input[type="password"], textarea { 
+            width: 100%; 
+            padding: 12px; 
+            margin-top: 8px; 
+            border: 2px solid #ddd; 
+            border-radius: 8px; 
+            box-sizing: border-box;
+        }
+
+        textarea { min-height: 100px; resize: vertical; }
+
+        textarea:disabled { 
+            background-color: #f5f5f5; 
+            cursor: not-allowed; 
+            opacity: 0.6;
+        }
+
+        .btn-submit { 
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white; 
+            padding: 18px; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            width: 100%; 
+            font-size: 1.3em; 
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #95a5a6;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-section">
+        <img src="1000004677.png" alt="شعار الجماعة" class="logo">
+        <div class="header-titles">
+            <h1>المملكة المغربية</h1>
+            <h2>جماعة أكادير - منصة المعطيات الرقمية</h2>
+        </div>
+    </div>
+
+    <form action="https://sheetdb.io/api/v1/umu8qch6kbhyt" method="POST" id="sheetdb-form">
+        
+        <div class="section" style="border-color: var(--gold-accent);">
+            <label>اسم الموظف المسؤول عن الإدخال:</label>
+            <input type="text" name="data[اسم_الموظف]" placeholder="الاسم الكامل" required>
+        </div>
+
+        <div class="section">
+            <span class="lock-badge">المصلحة الأولى</span>
+            <div class="lock-input-group">
+                <label>رمز التفعيل:</label>
+                <input type="password" placeholder="أدخل الرمز لفتح الخانات" oninput="unlockSection(this.value, 'dept1', ['text1', 'text2', 'text3'])">
+            </div>
+            <textarea id="text1" name="data[المصلحة_1_المجال_1]" placeholder="المجال 1..." disabled></textarea>
+            <textarea id="text2" name="data[المصلحة_1_المجال_2]" placeholder="المجال 2..." disabled></textarea>
+            <textarea id="text3" name="data[المصلحة_1_المجال_3]" placeholder="المجال 3..." disabled></textarea>
+        </div>
+
+        <div class="section">
+            <span class="lock-badge">المصلحة الثانية</span>
+            <div class="lock-input-group">
+                <label>رمز التفعيل:</label>
+                <input type="password" placeholder="أدخل الرمز لفتح الخانة" oninput="unlockSection(this.value, 'dept2', ['text4'])">
+            </div>
+            <textarea id="text4" name="data[المصلحة_2_المجال_4]" placeholder="المجال 4..." disabled></textarea>
+        </div>
+
+        <div class="section">
+            <span class="lock-badge">المصلحة الثالثة</span>
+            <div class="lock-input-group">
+                <label>رمز التفعيل:</label>
+                <input type="password" placeholder="أدخل الرمز لفتح الخانة" oninput="unlockSection(this.value, 'dept3', ['text5'])">
+            </div>
+            <textarea id="text5" name="data[المصلحة_3_المجال_5]" placeholder="المجال 5..." disabled></textarea>
+        </div>
+
+        <input type="hidden" name="data[التاريخ]" id="timestamp">
+
+        <button type="submit" class="btn-submit">حفظ وإرسال إلى قاعدة البيانات</button>
+    </form>
+    
+    <div class="footer">
+        © 2026 جماعة أكادير - جميع الحقوق محفوظة
+    </div>
+</div>
+
+<script>
+    const keys = {
+        dept1: "AGADIR1",
+        dept2: "AGADIR2",
+        dept3: "AGADIR3"
+    };
+
+    function unlockSection(val, dept, fields) {
+        const isCorrect = (val === keys[dept]);
+        fields.forEach(id => {
+            document.getElementById(id).disabled = !isCorrect;
+        });
+    }
+
+    // معالجة الإرسال لـ Google Sheets
+    var form = document.getElementById('sheetdb-form');
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      
+      // وضع التاريخ الحالي
+      document.getElementById('timestamp').value = new Date().toLocaleString('ar-MA');
+      
+      // تفعيل الخانات لإرسال القيم
+      document.querySelectorAll('textarea').forEach(t => t.disabled = false);
+
+      fetch(form.action, {
+          method : "POST",
+          body: new FormData(document.getElementById("sheetdb-form")),
+      }).then(
+          response => response.json()
+      ).then((html) => {
+        alert('تم بنجاح! تم تسجيل المعطيات في جدول بيانات جوجل.');
+        window.location.reload(); // إعادة تحميل الصفحة
+      });
+    });
+</script>
+
+</body>
+</html>
+
