@@ -40,27 +40,27 @@
     <form id="sheetdb-form">
         <div class="section" style="border-color: var(--gold-accent);">
             <label>الاسم الكامل للموظف المسؤول:</label>
-            <input type="text" name="اسم_الموظف" id="emp_name" placeholder="أدخل اسمك هنا" required>
+            <input type="text" name="Nom" id="emp_name" placeholder="أدخل اسمك هنا" required>
         </div>
 
         <div class="section">
             <span class="lock-badge">المصلحة الأولى</span>
             <input type="password" placeholder="رمز تفعيل المصلحة الأولى" oninput="unlockSection(this.value, 'dept1', ['m1_1', 'm1_2', 'm1_3'])">
-            <textarea id="m1_1" name="المصلحة_1_المجال_1" placeholder="تقرير المجال 1..." disabled></textarea>
-            <textarea id="m1_2" name="المصلحة_1_المجال_2" placeholder="تقرير المجال 2..." disabled></textarea>
-            <textarea id="m1_3" name="المصلحة_1_المجال_3" placeholder="تقرير المجال 3..." disabled></textarea>
+            <textarea id="m1_1" name="menu1" placeholder="تقرير المجال 1..." disabled></textarea>
+            <textarea id="m1_2" name="menu2" placeholder="تقرير المجال 2..." disabled></textarea>
+            <textarea id="m1_3" name="menu3" placeholder="تقرير المجال 3..." disabled></textarea>
         </div>
 
         <div class="section">
             <span class="lock-badge">المصلحة الثانية</span>
             <input type="password" placeholder="رمز تفعيل المصلحة الثانية" oninput="unlockSection(this.value, 'dept2', ['m2_4'])">
-            <textarea id="m2_4" name="المصلحة_2_المجال_4" placeholder="تقرير المجال 4..." disabled></textarea>
+            <textarea id="m2_4" name="menu4" placeholder="تقرير المجال 4..." disabled></textarea>
         </div>
 
         <div class="section">
             <span class="lock-badge">المصلحة الثالثة</span>
             <input type="password" placeholder="رمز تفعيل المصلحة الثالثة" oninput="unlockSection(this.value, 'dept3', ['m3_5'])">
-            <textarea id="m3_5" name="المصلحة_3_المجال_5" placeholder="تقرير المجال 5..." disabled></textarea>
+            <textarea id="m3_5" name="menu5" placeholder="تقرير المجال 5..." disabled></textarea>
         </div>
 
         <input type="hidden" name="التاريخ" id="timestamp">
