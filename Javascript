@@ -1,0 +1,6 @@
+function doGet() {
+  const data = getData(); // الدالة التي تجلب المصفوفة
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
