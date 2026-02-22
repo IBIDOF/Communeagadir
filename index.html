@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>نظام إدارة الخسائر الجماعية</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; text-align: right; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .row-card { border: 2px solid #007bff; padding: 20px; margin-bottom: 20px; border-radius: 8px; background: #f9f9f9; }
+        .row-card p { margin: 10px 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+        button { padding: 10px 25px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; font-weight: bold; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        input { padding: 12px; margin: 10px 0; width: 100%; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
+        .auth-section { background: #e9ecef; padding: 20px; margin-top: 25px; border-radius: 8px; border-top: 4px solid #28a745; }
+        #loading { color: #666; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>نظام تحديث بيانات الخسائر الجماعية</h2>
+        <hr>
+        <div id="content"><p id="loading">جاري جلب البيانات من Google Sheets...</p></div>
+        
+        <div class="controls">
+            <button id="prevBtn" onclick="prev()" disabled>السابق</button>
+            <span id="pageInfo">---</span>
+            <button id="nextBtn" onclick="next()" disabled>التالي</button>
+        </div>
+
+        <div class="auth-section">
+            <h4>إجراء تحديث (المصالح التقنية)</h4>
+            <input type="password" id="secretCode" placeholder="أدخل الكود السري الخاص بمصلحتك">
+            <input type="text" id="statusUpdate" placeholder="أدخل ملاحظات العمل أو حالة الإصلاح">
+            <button onclick="submitUpdate()" id="submitBtn" style="background: #28a745; width: 100%;">إرسال التحديث للجدول</button>
+        </div>
+    </div>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyEe0bAd5x_fTbwl3w6rjVfEHhXPHDs56kh9f0MTMqROtTLSniePg_kcYroGeBlW-LgpA/exec';
+        let allData = [];
+        let currentIndex = 1; // نبدأ من الصف الأول بعد العناوين
+
+        // وظيفة جلب البيانات عند فتح الصفحة
+        async function loadData() {
+            try {
+                const response = await fetch(scriptURL);
+                const data = await response.json();
+                
+                if (data && data.length > 1) {
+                    allData = data;
+                    displayRow();
+                    document.getElementById('nextBtn').disabled = false;
+                } else {
+                    document.getElementById('content').innerHTML = "لم يتم العثور على بيانات في الملف.";
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('content').innerHTML = "خطأ في الاتصال بالبيانات. تأكد من إعدادات النشر في Apps Script.";
+            }
+        }
+
+        function displayRow() {
+            if (allData.length <= 1) return;
+            const row = allData[currentIndex];
+            
+            [span_0](start_span)[span_1](start_span)// تخصيص عرض البيانات بناءً على أعمدة ملفك[span_0](end_span)[span_1](end_span)
+            document.getElementById('content').innerHTML = `
+                <div class="row-card">
+                    <p><strong>الرقم الترتيبي:</strong> ${row[0] || 'غير متوفر'}</p>
+                    <p><strong>رقم المحضر:</strong> ${row[1] || '---'}</p>
+                    <p><strong>التاريخ:</strong> ${row[2] || '---'}</p>
+                    <p><strong>الموقع:</strong> ${row[3] || 'غير محدد'}</p>
+                    <p><strong>طبيعة الضرر:</strong> ${row[4] || '---'}</p>
+                    <p style="color: blue;"><strong>ملاحظات مصلحة الإنارة:</strong> ${row[5] || 'لا يوجد تحديث'}</p>
+                    <p style="color: green;"><strong>ملاحظات مصلحة البيئة:</strong> ${row[6] || 'لا يوجد تحديث'}</p>
+                </div>
+            `;
+            document.getElementById('pageInfo').innerText = `سجل رقم ${currentIndex} من ${allData.length - 1}`;
+            
+            // تحديث حالة الأزرار
+            document.getElementById('prevBtn').disabled = (currentIndex <= 1);
+            document.getElementById('nextBtn').disabled = (currentIndex >= allData.length - 1);
+        }
+
+        function next() { if(currentIndex < allData.length - 1) { currentIndex++; displayRow(); } }
+        function prev() { if(currentIndex > 1) { currentIndex--; displayRow(); } }
+
+        async function submitUpdate() {
+            const code = document.getElementById('secretCode').value;
+            const value = document.getElementById('statusUpdate').value;
+            const rowId = allData[currentIndex][0];
+            const btn = document.getElementById('submitBtn');
+
+            if(!code || !value) { alert("الرجاء إدخال الكود والملاحظات"); return; }
+
+            btn.disabled = true;
+            btn.innerText = "جاري الإرسال...";
+
+            try {
+                // إرسال البيانات عبر POST إلى Google Apps Script
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    mode: 'no-cors', // لتجنب مشاكل CORS في المتصفح
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `code=${encodeURIComponent(code)}&rowId=${encodeURIComponent(rowId)}&value=${encodeURIComponent(value)}`
+                });
+                
+                alert("تم إرسال طلب التحديث بنجاح! سيظهر التغيير في الجدول قريباً.");
+                document.getElementById('statusUpdate').value = "";
+            } catch (e) {
+                alert("حدث خطأ أثناء الإرسال.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "إرسال التحديث للجدول";
+            }
+        }
+
+        // تشغيل الجلب التلقائي عند تحميل الصفحة
+        window.onload = loadData;
+    </script>
+</body>
+</html>
+
