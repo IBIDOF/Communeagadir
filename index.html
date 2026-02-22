@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة الخسائر الجماعية</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; text-align: right; }
+        .container { max-width: 700px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h2 { color: #1a73e8; border-bottom: 2px solid #e8eaed; padding-bottom: 10px; }
+        .row-card { background: #fff; border: 1px solid #d1d1d1; padding: 20px; border-radius: 10px; margin-top: 20px; min-height: 200px; }
+        .row-card p { font-size: 1.1em; line-height: 1.6; color: #3c4043; margin: 8px 0; }
+        .row-card strong { color: #202124; width: 120px; display: inline-block; }
+        .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
+        button { padding: 12px 25px; cursor: pointer; background-color: #1a73e8; color: white; border: none; border-radius: 6px; font-size: 16px; transition: 0.3s; }
+        button:hover { background-color: #1557b0; }
+        button:disabled { background-color: #dadce0; cursor: not-allowed; }
+        .auth-section { background: #f8f9fa; padding: 20px; margin-top: 30px; border-radius: 10px; border: 1px dashed #1a73e8; }
+        input { padding: 12px; margin: 10px 0; width: 100%; border: 1px solid #bdc1c6; border-radius: 6px; font-size: 15px; box-sizing: border-box; }
+        #loadingMsg { text-align: center; color: #5f6368; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>نظام إدارة بيانات الخسائر الجماعية</h2>
+    
+    <div id="content">
+        <p id="loadingMsg">جاري الاتصال بقاعدة البيانات... يرجى الانتظار</p>
+    </div>
+
+    <div class="controls">
+        <button id="prevBtn" onclick="prev()" disabled>السابق</button>
+        <span id="pageInfo">---</span>
+        <button id="nextBtn" onclick="next()" disabled>التالي</button>
+    </div>
+
+    <div class="auth-section">
+        <h4>تحديث الملاحظات (المصالح التقنية)</h4>
+        <input type="password" id="secretCode" placeholder="أدخل كود المصلحة">
+        <input type="text" id="statusUpdate" placeholder="أدخل الملاحظات هنا">
+        <button onclick="submitUpdate()" id="submitBtn" style="background-color: #34a853; width: 100%;">حفظ التحديث</button>
+    </div>
+</div>
+
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyEe0bAd5x_fTbwl3w6rjVfEHhXPHDs56kh9f0MTMqROtTLSniePg_kcYroGeBlW-LgpA/exec';
+    let allData = [];
+    let currentIndex = 1;
+
+    // وظيفة جلب البيانات المحسنة
+    async function loadData() {
+        const contentDiv = document.getElementById('content');
+        try {
+            // جلب البيانات مع وسيط عشوائي لمنع الـ Cache
+            const response = await fetch(scriptURL + "?action=read");
+            const data = await response.json();
+            
+            if (data && data.length > 1) {
+                allData = data;
+                displayRow();
+                document.getElementById('nextBtn').disabled = false;
+            } else {
+                contentDiv.innerHTML = "<p>عذراً، لم نتمكن من قراءة محتوى الجدول.</p>";
+            }
+        } catch (error) {
+            console.error("Error details:", error);
+            contentDiv.innerHTML = "<p style='color:red;'>تعذر عرض البيانات تلقائياً بسبب قيود المتصفح. حاول تنشيط الصفحة أو التأكد من إعدادات النشر.</p>";
+        }
+    }
+
+    function displayRow() {
+        if (allData.length <= 1) return;
+        const row = allData[currentIndex];
+        
+        document.getElementById('content').innerHTML = `
+            <div class="row-card">
+                <p><strong>الرقم:</strong> ${row[0] || '---'}</p>
+                <p><strong>المحضر:</strong> ${row[1] || '---'}</p>
+                <p><strong>التاريخ:</strong> ${row[2] || '---'}</p>
+                <p><strong>الموقع:</strong> ${row[3] || '---'}</p>
+                <p><strong>الضرر:</strong> ${row[4] || '---'}</p>
+                <hr>
+                <p style="color: #1a73e8;"><strong>مصلحة الإنارة:</strong> ${row[5] || 'لا توجد ملاحظات'}</p>
+                <p style="color: #34a853;"><strong>مصلحة البيئة:</strong> ${row[6] || 'لا توجد ملاحظات'}</p>
+            </div>
+        `;
+        document.getElementById('pageInfo').innerText = `سجل ${currentIndex} من ${allData.length - 1}`;
+        document.getElementById('prevBtn').disabled = (currentIndex <= 1);
+        document.getElementById('nextBtn').disabled = (currentIndex >= allData.length - 1);
+    }
+
+    function next() { if(currentIndex < allData.length - 1) { currentIndex++; displayRow(); } }
+    function prev() { if(currentIndex > 1) { currentIndex--; displayRow(); } }
+
+    async function submitUpdate() {
+        const code = document.getElementById('secretCode').value;
+        const value = document.getElementById('statusUpdate').value;
+        const rowId = allData[currentIndex][0];
+        const btn = document.getElementById('submitBtn');
+
+        if(!code || !value) { alert("أدخل الكود والملاحظات أولاً"); return; }
+        btn.disabled = true; btn.innerText = "جاري الحفظ...";
+
+        try {
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `code=${encodeURIComponent(code)}&rowId=${encodeURIComponent(rowId)}&value=${encodeURIComponent(value)}`
+            });
+            alert("تم الإرسال! انتظر ثوانٍ وحدث الصفحة لرؤية التغيير.");
+            document.getElementById('statusUpdate').value = "";
+        } catch (e) {
+            alert("حدث خطأ أثناء الإرسال");
+        } finally {
+            btn.disabled = false; btn.innerText = "حفظ التحديث";
+        }
+    }
+
+    window.onload = loadData;
+</script>
+
+</body>
+</html>
