@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة المعطيات - جماعة أكادير</title>
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --secondary-color: #34a853;
+            --bg-color: #f8f9fa;
+            --text-dark: #202124;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; text-align: right; color: var(--text-dark); }
+        
+        /* الترويسة والشعار */
+        .header-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; padding: 10px; }
+        .gov-info { font-size: 0.9em; font-weight: bold; line-height: 1.6; }
+        .logo-container { text-align: center; flex-grow: 1; }
+        .logo-container img { width: 120px; height: auto; margin-bottom: 5px; }
+        
+        .main-title { text-align: center; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; border-bottom: 4px solid var(--primary-color); }
+        .main-title h1 { margin: 0; font-size: 1.5em; color: var(--primary-color); }
+
+        .container { max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        
+        .row-card { background: #ffffff; border: 1px solid #e0e0e0; padding: 20px; border-radius: 10px; margin-top: 10px; box-shadow: inset 0 0 10px rgba(0,0,0,0.02); }
+        .row-card p { font-size: 1.05em; line-height: 1.8; margin: 10px 0; border-bottom: 1px solid #f1f1f1; padding-bottom: 5px; }
+        .row-card strong { color: #555; width: 140px; display: inline-block; }
+        
+        .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
+        button { padding: 10px 25px; cursor: pointer; background-color: var(--primary-color); color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; transition: 0.2s; }
+        button:hover { background-color: #1557b0; transform: translateY(-1px); }
+        button:disabled { background-color: #dadce0; cursor: not-allowed; }
+
+        .auth-section { background: #f1f3f4; padding: 20px; margin-top: 30px; border-radius: 10px; border-right: 5px solid var(--secondary-color); }
+        .auth-section h4 { margin-top: 0; color: var(--secondary-color); }
+        
+        input { padding: 12px; margin: 8px 0; width: 100%; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; box-sizing: border-box; }
+        input:focus { border-color: var(--primary-color); outline: none; background: #fff; }
+        
+        #loadingMsg { text-align: center; padding: 40px; color: #666; font-style: italic; }
+        .badge-eco { color: var(--secondary-color); font-weight: bold; }
+        .badge-light { color: var(--primary-color); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-section">
+        <div class="gov-info">
+            المملكة المغربية<br>
+            وزارة الداخلية<br>
+            عمالة أكادير إداوتنان<br>
+            جماعة أكادير
+        </div>
+        <div class="logo-container">
+            <img src="https://raw.githubusercontent.com/ibidof/ibidof.github.io/main/Communeagadir/1000004676.png" alt="شعار جماعة أكادير">
+        </div>
+        <div style="width: 140px;"></div> </div>
+
+    <div class="main-title">
+        <h1>نظام إدارة المعطيات بالجماعة</h1>
+    </div>
+
+    <div id="content">
+        <p id="loadingMsg">جاري الاتصال بقاعدة البيانات المركزية... يرجى الانتظار</p>
+    </div>
+
+    <div class="controls">
+        <button id="prevBtn" onclick="prev()" disabled>السابق</button>
+        <span id="pageInfo" style="font-weight: bold; color: #666;">---</span>
+        <button id="nextBtn" onclick="next()" disabled>التالي</button>
+    </div>
+
+    <div class="auth-section">
+        <h4>📝 تحديث سجل المصلحة</h4>
+        <input type="password" id="secretCode" placeholder="أدخل القن السري للمصلحة">
+        <input type="text" id="statusUpdate" placeholder="اكتب الملاحظات التقنية أو حالة الإنجاز هنا...">
+        <button onclick="submitUpdate()" id="submitBtn" style="background-color: var(--secondary-color); width: 100%;">حفظ وإرسال المعطيات</button>
+    </div>
+</div>
+
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxfm3u1FRJqdZfChlDM7iPBoCLGZ9-J-_EX6sSQK3qnXHmD66B8AuTnWXx-429w-yhN6g/exec';
+    let allData = [];
+    let currentIndex = 1;
+
+    async function loadData() {
+        const contentDiv = document.getElementById('content');
+        try {
+            const response = await fetch(scriptURL + "?action=read");
+            const data = await response.json();
+            
+            if (data && data.length > 1) {
+                allData = data;
+                displayRow();
+                document.getElementById('nextBtn').disabled = false;
+            } else {
+                contentDiv.innerHTML = "<p style='text-align:center;'>لا توجد سجلات حالياً في النظام.</p>";
+            }
+        } catch (error) {
+            contentDiv.innerHTML = "<p style='color:red; text-align:center;'>تعذر جلب البيانات. يرجى التأكد من اتصال الإنترنت.</p>";
+        }
+    }
+
+    function displayRow() {
+        if (allData.length <= 1) return;
+        const row = allData[currentIndex];
+        
+        document.getElementById('content').innerHTML = `
+            <div class="row-card">
+                <p><strong>الرقم الترتيبي:</strong> ${row[0] || '---'}</p>
+                <p><strong>رقم المحضر:</strong> ${row[1] || '---'}</p>
+                <p><strong>تاريخ الحادثة:</strong> ${row[2] || '---'}</p>
+                <p><strong>موقع الضرر:</strong> ${row[3] || '---'}</p>
+                <p><strong>وصف الخسائر:</strong> ${row[4] || '---'}</p>
+                <div style="margin-top:15px; border-top: 2px dashed #eee; padding-top:10px;">
+                    <p class="badge-light"><strong>مصلحة الإنارة:</strong> ${row[5] || 'في انتظار التحديث...'}</p>
+                    <p class="badge-eco"><strong>مصلحة البيئة:</strong> ${row[6] || 'في انتظار التحديث...'}</p>
+                </div>
+            </div>
+        `;
+        document.getElementById('pageInfo').innerText = `سجل رقم ${currentIndex} من أصل ${allData.length - 1}`;
+        document.getElementById('prevBtn').disabled = (currentIndex <= 1);
+        document.getElementById('nextBtn').disabled = (currentIndex >= allData.length - 1);
+    }
+
+    function next() { if(currentIndex < allData.length - 1) { currentIndex++; displayRow(); } }
+    function prev() { if(currentIndex > 1) { currentIndex--; displayRow(); } }
+
+    async function submitUpdate() {
+        const code = document.getElementById('secretCode').value;
+        const value = document.getElementById('statusUpdate').value;
+        const rowId = allData[currentIndex][0];
+        const btn = document.getElementById('submitBtn');
+
+        if(!code || !value) { alert("يرجى ملء جميع الخانات المطلوبة"); return; }
+        btn.disabled = true; btn.innerText = "جاري الحفظ والارشفة...";
+
+        try {
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `code=${encodeURIComponent(code)}&rowId=${encodeURIComponent(rowId)}&value=${encodeURIComponent(value)}`
+            });
+            alert("تم تحديث البيانات بنجاح في سجلات الجماعة.");
+            document.getElementById('statusUpdate').value = "";
+            document.getElementById('secretCode').value = "";
+        } catch (e) {
+            alert("فشل الإرسال، يرجى المحاولة لاحقاً");
+        } finally {
+            btn.disabled = false; btn.innerText = "حفظ وإرسال المعطيات";
+        }
+    }
+
+    window.onload = loadData;
+</script>
+
+</body>
+</html>
+
