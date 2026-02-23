@@ -76,13 +76,15 @@
         <button id="nextBtn" onclick="next()" disabled>التالي</button>
     </div>
 
-    <div class="auth-section">
-        <h4>📝 تحديث سجل المصلحة</h4>
-        <input type="password" id="secretCode" placeholder="أدخل القن السري لمصلحة المعنية بالحادثة ">
-        <input type="text" id="statusUpdate" placeholder="...اكتب التقرير المفصل عن الحادثة مع ادخال التقييم المالي بناء على الفواتير و مراجعها ">
-        <button onclick="submitUpdate()" id="submitBtn" style="background-color: var(--secondary-color); width: 100%;">حفظ وإرسال المعطيات</button>
-    </div>
+<div class="auth-section">
+    <h4>📝 تحديث سجل المصلحة</h4>
+    <input type="password" id="secretCode" placeholder="أدخل القن السري للمصلحة">
+    
+    <textarea id="statusUpdate" rows="6" placeholder="اكتب التقرير المفصل عن الحادثة مع ادخال التقييم المالي بناء على الفواتير و مراجعها..."></textarea>
+    
+    <button onclick="submitUpdate()" id="submitBtn" style="background-color: var(--secondary-color); width: 100%;">حفظ وإرسال المعطيات</button>
 </div>
+
 
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxfm3u1FRJqdZfChlDM7iPBoCLGZ9-J-_EX6sSQK3qnXHmD66B8AuTnWXx-429w-yhN6g/exec';
