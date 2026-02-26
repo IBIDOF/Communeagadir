@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة القيادة - جماعة أكادير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0b3d91;
+            --secondary: #1b5e20;
+            --accent: #d4af37;
+            --light: #f4f6f9;
+            --white: #ffffff;
+            --shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Cairo', sans-serif; background: var(--light); }
+
+        .wrapper { display: flex; min-height: 100vh; }
+
+        /* ===== Sidebar ===== */
+        .sidebar { width: 250px; background: var(--primary); color: white; padding: 20px; transition: 0.3s; }
+        .sidebar h2 { text-align: center; margin-bottom: 30px; font-size: 20px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; }
+        .sidebar a { display: block; color: white; text-decoration: none; padding: 12px; border-radius: 8px; margin-bottom: 10px; transition: 0.3s; cursor: pointer; }
+        .sidebar a:hover { background: rgba(255,255,255,0.15); transform: translateX(-5px); }
+        .sidebar a.active { background: var(--accent); color: var(--primary); font-weight: bold; }
+
+        /* ===== Main Content ===== */
+        .main { flex: 1; padding: 30px; }
+        .topbar { background: white; padding: 15px 25px; border-radius: 12px; box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .topbar h1 { margin: 0; font-size: 22px; color: var(--primary); }
+
+        /* ===== Stats ===== */
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .card { background: white; padding: 20px; border-radius: 14px; box-shadow: var(--shadow); text-align: center; }
+        .card h3 { margin: 0; font-size: 14px; color: gray; }
+        .card p { font-size: 28px; font-weight: 800; margin: 10px 0 0; color: var(--primary); }
+
+        /* ===== Search & Content ===== */
+        .search-box { margin-bottom: 20px; }
+        .search-box input { width: 100%; padding: 14px 25px; border-radius: 30px; border: 2px solid #e0e0e0; font-size: 14px; outline: none; transition: 0.3s; font-family: 'Cairo'; }
+        .search-box input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(11,61,145,0.1); }
+
+        .data-card { background: white; padding: 30px; border-radius: 14px; box-shadow: var(--shadow); border-right: 6px solid var(--primary); animation: fadeIn 0.4s ease-in-out; min-height: 200px; }
+        .data-card p { margin: 12px 0; font-size: 16px; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
+        .data-card strong { color: var(--primary); width: 150px; display: inline-block; }
+
+        .controls { margin-top: 25px; display: flex; justify-content: center; gap: 15px; }
+        button { padding: 10px 35px; border: none; border-radius: 30px; background: var(--primary); color: white; cursor: pointer; font-weight: bold; font-family: 'Cairo'; transition: 0.3s; }
+        button:hover { background: var(--accent); color: var(--primary); transform: scale(1.05); }
+
+        /* ===== Modal Gallery ===== */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; flex-direction: column; }
+        .modal img { max-width: 85%; max-height: 75%; border: 5px solid white; border-radius: 10px; cursor: pointer; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .modal h2 { color: var(--accent); margin-bottom: 15px; }
+        .modal p { color: white; margin-top: 15px; font-size: 14px; }
+        .close-btn { position: absolute; top: 30px; left: 30px; color: white; font-size: 40px; cursor: pointer; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @media(max-width: 900px) { .sidebar { display: none; } }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="sidebar">
+        <h2>جماعة أكادير</h2>
+        <a href="#" class="active">🏠 لوحة القيادة</a>
+        <a onclick="openGallery()">🔄 مراحل التتبع</a>
+        <a href="#">📂 المحاضر</a>
+        <a href="#">📊 التقارير</a>
+        <a href="#">⚙ الإعدادات</a>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <h1>نظام إدارة المعطيات الجماعية</h1>
+            <div style="font-size: 14px; font-weight: 600;">المملكة المغربية - أكادير</div>
+        </div>
+
+        <div class="stats">
+            <div class="card">
+                <h3>إجمالي السجلات</h3>
+                <p id="totalRecords">0</p>
+            </div>
+            <div class="card">
+                <h3>السجل الحالي</h3>
+                <p id="currentRecord">0</p>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 ابحث بالموظف، الموقع، أو طبيعة الضرر..." onkeyup="searchData()">
+        </div>
+
+      <div id="content">
+    <div class="data-card">جاري تحميل البيانات من السيرفر...</div>
+</div>
+
+<div id="pageInfo" style="text-align: center; margin-top: 10px; font-weight: bold;"></div>
+
+<div class="controls">
+    <button id="prevBtn" onclick="prev()">السابق</button>
+    <button id="nextBtn" onclick="next()">التالي</button>
+</div>
+
+<hr style="margin: 30px 0; border: 0; border-top: 1px dashed #ccc;">
+
+<div class="data-card" style="border-right-color: var(--accent);">
+    <h3 style="margin-top: 0;">تحديث حالة السجل</h3>
+    <input type="password" id="secretCode" placeholder="أدخل الكود السري" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd;">
+    <textarea id="statusUpdate" placeholder="اكتب الملاحظات أو التحديث هنا..." style="width: 100%; padding: 10px; height: 80px; border-radius: 8px; border: 1px solid #ddd; font-family: 'Cairo';"></textarea>
+    <button id="submitBtn" onclick="submitUpdate()" style="width: 100%; margin-top: 10px; background: var(--secondary);">حفظ التحديث</button>
+</div>
+
+
+<div id="imageModal" class="modal" onclick="nextGalleryImage()">
+    <span class="close-btn" onclick="closeGallery(event)">&times;</span>
+    <h2 id="imageTitle">مراحل التتبع للمشروع</h2>
+    <img id="galleryImg" src="" alt="التتبع">
+    <p>اضغط على الصورة للانتقال للمرحلة التالية</p>
+</div>
+
+<script>
+    // رابط البيانات الخاص بك
+
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyKrpcKLZd6GeLoYyFoSOULiGhCOOLJ5EpLuI4DvwO-t3oc3BZyStF0-Tppt5e7WKRr-g/exec';
+    let allData = [];
+    let currentIndex = 0;
+
+    // إعداد صور التتبع
+    const galleryImages = [
+        'images/Image1.png', 
+        'images/Image2.png',
+        'images/Image3.png',
+        'images/Image4.png'
+    ];
+    let galleryIdx = 0;
+
+    async function loadData() {
+        try {
+            const res = await fetch(scriptURL);
+            allData = await res.json();
+            if(allData.length > 0) {
+                document.getElementById('totalRecords').innerText = allData.length;
+                displayRow();
+            } else {
+                document.getElementById('content').innerHTML = '<div class="data-card">لا توجد بيانات مسجلة حالياً.</div>';
+            }
+        } catch(e) {
+            document.getElementById('content').innerHTML = '<div class="data-card">خطأ في جلب البيانات. تأكد من إعدادات الـ API</div>';
+        }
+    }
+
+    function displayRow() {
+        if (allData.length <= 1) return;
+        const row = allData[currentIndex];
+        
+        document.getElementById('content').innerHTML = `
+            <div class="row-card">
+                <p><strong>الرقم:</strong> ${row[0] || '---'}</p>
+                <p><strong>المحضر:</strong> ${row[1] || '---'}</p>
+                <p><strong>التاريخ:</strong> ${row[2] || '---'}</p>
+                <p><strong>الموقع:</strong> ${row[3] || '---'}</p>
+                <p><strong>الضرر:</strong> ${row[4] || '---'}</p>
+                <hr>
+                <p style="color: #1a73e8;"><strong>مصلحة الإنارة:</strong> ${row[5] || 'لا توجد ملاحظات'}</p>
+                <p style="color: #34a853;"><strong>مصلحة البيئة:</strong> ${row[6] || 'لا توجد ملاحظات'}</p>
+            </div>
+        `;
+        document.getElementById('pageInfo').innerText = `سجل ${currentIndex} من ${allData.length - 1}`;
+        document.getElementById('prevBtn').disabled = (currentIndex <= 1);
+        document.getElementById('nextBtn').disabled = (currentIndex >= allData.length - 1);
+    }
+
+    function next() { if(currentIndex < allData.length - 1) { currentIndex++; displayRow(); } }
+    function prev() { if(currentIndex > 1) { currentIndex--; displayRow(); } }
+
+    async function submitUpdate() {
+        const code = document.getElementById('secretCode').value;
+        const value = document.getElementById('statusUpdate').value;
+        const rowId = allData[currentIndex][0];
+        const btn = document.getElementById('submitBtn');
+
+        if(!code || !value) { alert("أدخل الكود والملاحظات أولاً"); return; }
+        btn.disabled = true; btn.innerText = "جاري الحفظ...";
+
+        try {
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `code=${encodeURIComponent(code)}&rowId=${encodeURIComponent(rowId)}&value=${encodeURIComponent(value)}`
+            });
+            alert("تم الإرسال! انتظر ثوانٍ وحدث الصفحة لرؤية التغيير.");
+            document.getElementById('statusUpdate').value = "";
+        } catch (e) {
+            alert("حدث خطأ أثناء الإرسال");
+        } finally {
+            btn.disabled = false; btn.innerText = "حفظ التحديث";
+        }
+    }
+
+    window.onload = loadData;
+
+    // وظائف معرض الصور
+    function openGallery() {
+        galleryIdx = 0;
+        document.getElementById('galleryImg').src = galleryImages[galleryIdx];
+        document.getElementById('imageModal').style.display = 'flex';
+    }
+
+    function nextGalleryImage() {
+        galleryIdx++;
+        if (galleryIdx >= galleryImages.length) {
+            closeGallery();
+        } else {
+            document.getElementById('galleryImg').src = galleryImages[galleryIdx];
+        }
+    }
+
+    function closeGallery(event) {
+        if(event) event.stopPropagation();
+        document.getElementById('imageModal').style.display = 'none';
+    }
+
+    window.onload = loadData;
+</script>
+
+</body>
+</html>
